@@ -1,6 +1,6 @@
 # Meditation App User Stories
 
-## Exercise 2: Login/Registration Page
+## Login/Registration Page
 
 ### User Story 1: User Registration
 **Title:**
@@ -86,7 +86,7 @@ _As a user, I want my details to be stored in local storage, so that my data per
 
 ---
 
-## Exercise 3: Homepage
+## Homepage
 
 ### User Story 5: Personalized Greeting
 **Title:**
@@ -175,7 +175,7 @@ _As a user, I want intuitive navigation icons, so that I can easily move around 
 
 ---
 
-## Exercise 4: Detailed Exercise Page
+## Detailed Exercise Page
 
 ### User Story 9: Display Exercise Banner and Info
 **Title:**
@@ -285,7 +285,7 @@ _As a user, I want navigation icons for sharing and going back, so that I can ea
 
 ---
 
-## Exercise 5: Add to Favorites Functionality
+## Add to Favorites Functionality
 
 ### User Story 14: Add Item to Favorites
 **Title:**
@@ -351,7 +351,7 @@ _As a user, I want a "My Favorites" screen, so that I can view and manage all my
 
 ---
 
-## Exercise 6: Daily Reminders
+## Daily Reminders
 
 ### User Story 17: View and Navigate Calendar
 **Title:**
@@ -441,7 +441,7 @@ _As a user, I want to see a list of all my reminders, so that I can manage them 
 
 ---
 
-## Exercise 7: Sharing Exercises
+## Sharing Exercises
 
 ### User Story 21: Share Exercises with Others
 **Title:**
@@ -489,7 +489,7 @@ _As a user, I want a clear and visible logout button, so that I can easily log o
 
 ---
 
-## Exercise 9: Change Settings (Theme Toggle)
+## Change Settings (Theme Toggle)
 
 ### User Story 23: Switch Between Light and Dark Themes
 **Title:**
