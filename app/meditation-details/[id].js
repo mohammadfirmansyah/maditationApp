@@ -1,52 +1,135 @@
-import React from "react";
+import { Stack, useGlobalSearchParams, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   SafeAreaView,
   ScrollView,
-  Image,
+  ActivityIndicator,
+  RefreshControl,
+  Share,
+  Alert,
+  StyleSheet,
 } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { COLORS, SIZES, FONT } from "../../constants/theme";
+import {
+  MeditationTopDisplay,
+  About,
+  Footer,
+  Tabs,
+} from "../../components";
 import ScreenHeaderBtn from "../../components/ScreenHeaderBtn";
+import { COLORS, icons, SIZES } from "../../constants";
+import useFetch from "../../hook/useFetch";
+
+// Define available tabs for meditation details
+const tabs = ["About", "Instructions"];
 
 const MeditationDetails = () => {
-  const { id } = useLocalSearchParams();
+  // Get meditation ID from route parameters
+  const params = useGlobalSearchParams();
+  const id = params.id;
+  
+  // Fetch meditation data using custom hook
+  const { data, isLoading, error, refetch } = useFetch("search", {
+    query: id,
+  });
+  const meditationItem = useFetch().getItemById(parseInt(id, 10));
+  
+  // State management for active tab and refresh status
+  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [refreshing, setRefreshing] = useState(false);
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerStyle: { backgroundColor: COLORS.lightWhite },
-          headerShadowVisible: false,
-          headerLeft: () => <ScreenHeaderBtn detailPage={true} />,
-          headerTitle: "Meditation Details",
-        }}
-      />
+  // Handle pull-to-refresh functionality
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    refetch();
+    setRefreshing(false);
+  }, []);
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <View style={styles.content}>
-          {/* Placeholder content */}
-          <View style={styles.placeholderContainer}>
-            <View style={styles.imagePlaceholder}>
-              <Text style={styles.placeholderText}>🧘</Text>
-            </View>
-            <Text style={styles.title}>Meditation Details</Text>
-            <Text style={styles.subtitle}>
-              Details for meditation ID: {id}
-            </Text>
-            <Text style={styles.description}>
-              This page will display detailed information about the selected
-              meditation session, including title, description, duration,
-              category, and audio controls.
-            </Text>
+  // Display content based on selected tab
+  const displayTabContent = () => {
+    if (activeTab === "About") {
+      return (
+        <About
+          title={meditationItem.title}
+          info={meditationItem.description ?? "No data provided"}
+        />
+      );
+    } else if (activeTab === "Instructions") {
+      return (
+        <View style={styles.specificsContainer}>
+          <Text style={styles.specificsTitle}>Instructions:</Text>
+          <View style={styles.pointsContainer}>
+            {(meditationItem.instructions ?? ["N/A"]).map((item, index) => (
+              <View style={styles.pointWrapper} key={index}>
+                <View style={styles.pointDot} />
+                <Text style={styles.pointText}>{item}</Text>
+              </View>
+            ))}
           </View>
         </View>
+      );
+    }
+    return null;
+  };
+
+  // Share meditation details with others
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: `Check out this meditation: ${meditationItem.title} (${meditationItem.duration})`,
+      });
+      if (result.action === Share.dismissedAction) {
+        // Share dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      {/* Header with share button */}
+      <ScreenHeaderBtn detailPage={true} handleShare={onShare} />
+      
+      {/* Scrollable content with pull-to-refresh */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {isLoading ? (
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        ) : error ? (
+          <Text>Something went wrong</Text>
+        ) : !meditationItem || meditationItem.length === 0 ? (
+          <Text>No data available</Text>
+        ) : (
+          <View style={{ padding: SIZES.medium, paddingBottom: 100 }}>
+            {/* Display meditation image, title, and info */}
+            <MeditationTopDisplay
+              meditationImage={meditationItem.image}
+              meditationTitle={meditationItem.title}
+              duration={meditationItem.duration}
+              target={meditationItem.target}
+            />
+            
+            {/* Tab navigation between About and Instructions */}
+            <Tabs
+              tabs={tabs}
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+            />
+            
+            {/* Display content based on active tab */}
+            {displayTabContent()}
+          </View>
+        )}
       </ScrollView>
+      
+      {/* Footer with favorite button */}
+      <Footer data={meditationItem} />
     </SafeAreaView>
   );
 };
@@ -54,54 +137,31 @@ const MeditationDetails = () => {
 export default MeditationDetails;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.lightWhite,
+  specificsContainer: {
+    padding: SIZES.medium,
   },
-  scrollContent: {
-    paddingBottom: SIZES.xLarge,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: SIZES.medium,
-    paddingTop: SIZES.large,
-  },
-  placeholderContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    padding: SIZES.large,
-  },
-  imagePlaceholder: {
-    width: 200,
-    height: 200,
-    backgroundColor: COLORS.white,
-    borderRadius: SIZES.medium,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: SIZES.large,
-  },
-  placeholderText: {
-    fontSize: 80,
-  },
-  title: {
-    fontSize: SIZES.xLarge,
-    fontFamily: FONT.bold,
-    color: COLORS.primary,
+  specificsTitle: {
+    fontSize: SIZES.large,
+    fontWeight: "bold",
     marginBottom: SIZES.small,
-    textAlign: "center",
   },
-  subtitle: {
+  pointsContainer: {
+    marginTop: SIZES.small,
+  },
+  pointWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: SIZES.small / 2,
+  },
+  pointDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: COLORS.primary,
+    marginRight: SIZES.small,
+  },
+  pointText: {
     fontSize: SIZES.medium,
-    fontFamily: FONT.medium,
     color: COLORS.gray,
-    marginBottom: SIZES.medium,
-    textAlign: "center",
-  },
-  description: {
-    fontSize: SIZES.small + 2,
-    fontFamily: FONT.regular,
-    color: COLORS.gray,
-    textAlign: "center",
-    lineHeight: 24,
   },
 });

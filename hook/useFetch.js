@@ -97,7 +97,30 @@ const useFetch = () => {
     fetchData();
   }, []);
 
-  return { data, isLoading, error, meditationData, BestMeditations };
+  // Method to get a specific meditation item by ID
+  const getItemById = (id) => {
+    const allMeditations = [...meditationData, ...BestMeditations];
+    return allMeditations.find((item) => item.id === id);
+  };
+
+  // Method to refetch data (for pull-to-refresh)
+  const refetch = () => {
+    setIsLoading(true);
+    setTimeout(() => {
+      setData([...meditationData, ...BestMeditations]);
+      setIsLoading(false);
+    }, 500);
+  };
+
+  return { 
+    data, 
+    isLoading, 
+    error, 
+    meditationData, 
+    BestMeditations,
+    getItemById,
+    refetch,
+  };
 };
 
 export default useFetch;
