@@ -52,6 +52,14 @@ const Settings = () => {
 
           {/* Settings Options */}
           <View style={styles.settingsSection}>
+            <TouchableOpacity 
+              style={styles.settingItem}
+              onPress={() => router.push("/settings/Favourites")}
+            >
+              <Text style={styles.settingLabel}>Favorites</Text>
+              <Text style={styles.settingValue}>View your favorite meditations</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.settingItem}>
               <Text style={styles.settingLabel}>Profile</Text>
               <Text style={styles.settingValue}>View and edit profile</Text>
