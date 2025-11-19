@@ -12,6 +12,7 @@ import { Stack } from "expo-router";
 import { COLORS, SIZES } from "../constants/theme";
 import ScreenHeaderBtn from "../components/ScreenHeaderBtn";
 import Welcome from "../components/Welcome";
+import DailyQuote from "../components/DailyQuote";
 import PopularMeditation from "../components/PopularMeditation";
 import DailyMeditation from "../components/DailyMeditation";
 
@@ -73,6 +74,8 @@ const Home = () => {
         <View style={styles.screensDisplay} testID="screensDisplay">
           {/* Welcome section with user greeting */}
           <Welcome userDetails={userDetails} />
+
+          <DailyQuote />
 
           {/* Popular meditation section */}
           <View style={styles.sectionContainer}>
